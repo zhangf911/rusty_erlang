@@ -1,0 +1,8 @@
+[package]
+
+name = "rusty_erl"
+version = "18.0.0"
+authors = ["Dmytro Lytovchenko <dmytro.lytovchenko@gmail.com>"]
+
+[[bin]]
+name = "rusty_erl"
