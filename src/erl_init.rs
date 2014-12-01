@@ -2,22 +2,40 @@ use erl_alloc;
 
 static EMULATOR_TYPE: &'static str = "Rusty BEAM";
 static ERLANG_VERSION: &'static str = "18.0";
+static ERTS_DEFAULT_MAX_PROCESSES: uint = 1 << 18;
+static ERTS_DEFAULT_MAX_PORTS: uint = 1 << 18;
 
+// Core configuration and global variables for erts
 pub struct ErlInit {
   erts_no_crash_dump: bool,
   erts_init_module: String,
   erts_init_fun: String,
+
+  ncpu: uint,
+  proc_tab_sz: uint,
+  port_tab_sz: uint,
+  port_tab_sz_ignore_files: uint,
+}
+
+impl ErlInit {
+  pub fn new() -> ErlInit {
+	  ErlInit {
+	    erts_no_crash_dump: false,
+	    erts_init_module: "init".to_string(),
+	    erts_init_fun: "boot".to_string(),
+	    ncpu: 1,
+	    proc_tab_sz: ERTS_DEFAULT_MAX_PROCESSES,
+	    port_tab_sz: ERTS_DEFAULT_MAX_PORTS,
+	    port_tab_sz_ignore_files: 0
+	  }
+  }
 }
 
 pub fn start(args: &Vec<String>) -> Result<ErlInit, ()> {
   erl_alloc::init(args);
 
   let mut i: uint = 1;
-  let mut init = ErlInit {
-    erts_no_crash_dump: false,
-    erts_init_module: "init".to_string(),
-    erts_init_fun: "boot".to_string()
-  };
+  let mut init = ErlInit::new();
 
   while i < args.len() {
     match args[i].as_slice() {
@@ -48,7 +66,8 @@ pub fn start(args: &Vec<String>) -> Result<ErlInit, ()> {
     }
     i += 1;
   }
-  return Ok(init);
+
+  return erl_init(init);
 }
 
 fn print_version() {
@@ -71,4 +90,8 @@ fn get_arg(args: &Vec<String>, i: &mut uint) -> Result<String, ()> {
     return Ok(args[*i].clone());
   }
   return Err(());
+}
+
+fn erl_init(init: ErlInit) -> Result<ErlInit, ()> {
+  return Ok(init);
 }
