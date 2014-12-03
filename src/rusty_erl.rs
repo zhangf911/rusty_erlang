@@ -1,13 +1,17 @@
-#![crate_id = "rusty_erlang#18.0"]
+//#![crate_id = "rusty_erlang#18.0"]
+#[allow(unused_variables)]
 use std::os;
 
-mod beam_types;
+mod alloc;
+mod atom;
+mod types;
 mod erl_init;
-mod erl_alloc;
+mod fun;
+mod world;
 
 fn main() {
   match erl_init::start(&os::args()) {
-  Ok(erlinit)  => println!("ok go!"),
-  Err(erlinit) => return
+  Ok(_world)  => println!("ok go!"),
+  Err(()) => return
   }
 }

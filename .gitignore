@@ -1,4 +1,7 @@
+# IntelliJ and other IDE temporaries
 .project
+.idea
+*.iml
 
 # Compiled files
 *.o
