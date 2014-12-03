@@ -158,6 +158,3 @@ fn erl_init(_state: &mut world::State) {
   //packet_parser_init();
   //erl_nif_init();
 }
-
-//fn init_atom_table(state: &mut world::State) {
-//}

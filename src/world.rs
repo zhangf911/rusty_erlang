@@ -6,6 +6,7 @@ pub struct State {
   erl_init: erl_init::ErlInit,
   atoms:    atom::AtomTable,
   funs:     fun::FunTable,
+  clock:    Uint
 }
 
 impl State {
@@ -14,6 +15,7 @@ impl State {
       erl_init: init,
       atoms:  atom::AtomTable::new(),
       funs:   fun::FunTable::new(),
+      clock:  0, // TODO: get_time and all that stuff
     }
   }
 }
