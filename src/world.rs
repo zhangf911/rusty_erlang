@@ -5,7 +5,7 @@ use types::{Uint};
 #[allow(dead_code)]
 pub struct State {
   erl_init:   erl_init::ErlInit,
-  atoms:      atom::Table,
+  pub atoms:  atom::Table,
   funs:       fun::Table,
   modules:    module::Table,
   processes:  process::Table,

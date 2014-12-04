@@ -10,6 +10,7 @@ mod fun;
 mod module;
 mod process;
 mod process_reg;
+mod term;
 mod world;
 
 fn main() {

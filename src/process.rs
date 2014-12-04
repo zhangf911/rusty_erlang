@@ -1,5 +1,6 @@
 use std::collections::{HashMap};
-use types::{Uint, Sint, Eterm, ApproxTime, BeamPtr, BeamInstr, Pid};
+use types::{Uint, Sint, Eterm, ApproxTime, BeamPtr, BeamInstr, BeamCode, Pid};
+use world;
 
 pub type ProcDict = HashMap<String, Eterm>;
 
@@ -156,4 +157,10 @@ impl ProcessTable {
   pub fn new() -> ProcessTable {
     ProcessTable{ entries: HashMap::new(), }
   }
+}
+
+fn first_process_otp(state: &mut world::State, mod_name: String,
+                     code: Option<BeamCode>, args: Vec<String>)
+{
+  let start_mod = state.atoms.put(&mod_name);
 }

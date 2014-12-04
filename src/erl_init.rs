@@ -13,9 +13,9 @@ pub struct ErlInit {
   erts_init_module: String,
   erts_init_fun: String,
 
-  ncpu: uint,
-  proc_tab_sz: uint,
-  port_tab_sz: uint,
+  ncpu:                     uint,
+  proc_tab_sz:              uint,
+  port_tab_sz:              uint,
   port_tab_sz_ignore_files: uint,
 }
 
@@ -97,64 +97,5 @@ fn get_arg(args: &Vec<String>, i: &mut uint) -> Result<String, ()> {
 }
 
 fn erl_init(_state: &mut world::State) {
-  //init_benchmarking();
-  //erts_init_monitors();
-  //erts_init_time();
-  //erts_init_sys_common_misc();
-  //erts_init_process(ncpu, proc_tab_sz, legacy_proc_tab);
-  /*erts_init_scheduling(no_schedulers,
-                       no_schedulers_online
-#ifdef ERTS_DIRTY_SCHEDULERS
-                       , no_dirty_cpu_schedulers,
-                       no_dirty_cpu_schedulers_online,
-                       no_dirty_io_schedulers
-#endif
-                      );*/
-  //erts_init_cpu_topology(); /* Must be after init_scheduling */
-  //erts_init_gc(); /* Must be after init_scheduling */
-  //erts_alloc_late_init();
 
-  //H_MIN_SIZE      = erts_next_heap_size(H_MIN_SIZE, 0);
-  //BIN_VH_MIN_SIZE = erts_next_heap_size(BIN_VH_MIN_SIZE, 0);
-
-  //erts_init_trace();
-  //erts_init_bits();
-  //erts_code_ix_init();
-  //erts_init_fun_table();      ++
-  //init_atom_table(state);     ++
-  //init_export_table();        --
-  //init_module_table();        ++
-  //init_register_table();
-  //init_message();
-  //erts_bif_info_init();
-  //erts_ddll_init();
-  //init_emulator();
-  //erts_ptab_init(); /* Must be after init_emulator() */
-  //erts_init_binary(); /* Must be after init_emulator() */
-  //erts_bp_init();
-  //init_db(); /* Must be after init_emulator */
-  //erts_bif_timer_init();
-  //erts_init_node_tables();
-  //init_dist();
-  //erl_drv_thr_init();
-  //erts_init_async();
-  //erts_init_io(port_tab_sz, port_tab_sz_ignore_files, legacy_port_tab);
-  //init_load();
-  //erts_init_bif();
-  //erts_init_bif_chksum();
-  //erts_init_bif_binary();
-  //erts_init_bif_re();
-  //erts_init_unicode(); /* after RE to get access to PCRE unicode */
-  //erts_init_external();
-  //erts_delay_trap = erts_export_put(am_erlang, am_delay_trap, 2);
-  //erts_late_init_process();
-/*#if HAVE_ERTS_MSEG
-  erts_mseg_late_init(); // Must be after timer (erts_init_time()) and thread
-            //initializations
-#endif*/
-/*#ifdef HIPE
-  hipe_mode_switch_init(); // Must be after init_load/beam_catches/init
-#endif*/
-  //packet_parser_init();
-  //erl_nif_init();
 }

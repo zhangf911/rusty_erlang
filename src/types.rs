@@ -1,10 +1,15 @@
+use std::rc::Rc;
+
 pub type Uint = u64;
 pub type Sint = i64;
+pub const Uint_Sizeof: uint = 8; // bytes
 
 pub type Uword = Uint;
 pub type Sword = Sint;
 
 pub type BeamInstr = Uword;
+pub type BeamVec  = Vec<BeamInstr>;
+pub type BeamCode = Rc<BeamVec>; // refcounted
 
 // pointer to beam instruction in beam table
 // TODO: refer to some beam storage object + offset?
