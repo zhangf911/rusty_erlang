@@ -7,6 +7,9 @@ mod atom;
 mod types;
 mod erl_init;
 mod fun;
+mod module;
+mod process;
+mod process_reg;
 mod world;
 
 fn main() {

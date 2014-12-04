@@ -17,6 +17,7 @@ pub struct FunEntry {
 pub struct FunTable {
   entries:  HashMap<String, FunEntry>
 }
+pub type Table = FunTable;
 
 impl FunTable {
   pub fn new() -> FunTable {

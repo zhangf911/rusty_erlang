@@ -122,8 +122,8 @@ fn erl_init(_state: &mut world::State) {
   //erts_code_ix_init();
   //erts_init_fun_table();      ++
   //init_atom_table(state);     ++
-  //init_export_table();
-  //init_module_table();
+  //init_export_table();        --
+  //init_module_table();        ++
   //init_register_table();
   //init_message();
   //erts_bif_info_init();

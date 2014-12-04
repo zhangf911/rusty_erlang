@@ -1,8 +1,7 @@
-use std::collections::HashMap;
-use types::{Uint, Sint};
+use std::collections::{HashMap};
+use types::{Uint, Sint, Eterm, ApproxTime, BeamPtr, BeamInstr, Pid};
 
-pub type Pid = Uint;
-pub type HashMap<String, Eterm> = ProcDict;
+pub type ProcDict = HashMap<String, Eterm>;
 
 #[allow(dead_code)]
 pub struct MessageQueue {
@@ -38,8 +37,8 @@ pub struct Process {
   //unsigned max_arg_reg; /* Maximum number of argument registers available. */
   //Eterm def_arg_reg[6]; /* Default array for argument registers. */
 
-  cp: BeamInstrPtr,   // (untagged) Continuation pointer (for threaded code)
-  i:  BeamInstrPtr,   // Program counter for threaded code
+  cp: BeamPtr,   // (untagged) Continuation pointer (for threaded code)
+  i:  BeamPtr,   // Program counter for threaded code
   //Sint catches;   // Number of catches on stack
   //Sint fcalls;    // Number of reductions left to execute
                     // Only valid for the current process
@@ -69,53 +68,54 @@ pub struct Process {
 
   dictionary: ProcDict,      // Process dictionary, may be NULL
 
-  Uint seq_trace_clock;
-  Uint seq_trace_lastcnt;
-  Eterm seq_trace_token;  /* Sequential trace token (tuple size 5 see below) */
+  //Uint seq_trace_clock;
+  //Uint seq_trace_lastcnt;
+  //Eterm seq_trace_token;  /* Sequential trace token (tuple size 5 see below) */
 
-#ifdef USE_VM_PROBES
-  Eterm dt_utag;              /* Place to store the dynamc trace user tag */
-  Uint dt_utag_flags;         /* flag field for the dt_utag */
-#endif
-  BeamInstr initial[3]; /* Initial module(0), function(1), arity(2), often used instead
-           of pointer to funcinfo instruction, hence the BeamInstr datatype */
-  BeamInstr *current;   /* Current Erlang function, part of the funcinfo:
-         * module(0), function(1), arity(2)
-         * (module and functions are tagged atoms;
-         * arity an untagged integer). BeamInstr * because it references code
-         */
+//#ifdef USE_VM_PROBES
+//  Eterm dt_utag;              /* Place to store the dynamc trace user tag */
+//  Uint dt_utag_flags;         /* flag field for the dt_utag */
+//#endif
+  //Initial module(0), function(1), arity(2), often used instead
+  //of pointer to funcinfo instruction, hence the BeamInstr datatype
+  initial: Vec<BeamInstr>,
+  // Current Erlang function, part of the funcinfo:
+  // module(0), function(1), arity(2)
+  // (module and functions are tagged atoms;
+  // arity an untagged integer). BeamInstr * because it references code
+  current: BeamPtr,
 
-  /*
-   * Information mainly for post-mortem use (erl crash dump).
-   */
-  Eterm parent;   /* Pid of process that created this process. */
-  erts_approx_time_t approx_started; /* Time when started. */
+  //
+  // Information mainly for post-mortem use (erl crash dump)
+  //
+  parent: Eterm,   // Pid of process that created this process
+  approx_started: ApproxTime, // Time when started
 
   /* This is the place, where all fields that differs between memory
    * architectures, have gone to.
    */
 
-  Eterm *high_water;
-  Eterm *old_hend;            /* Heap pointers for generational GC. */
-  Eterm *old_htop;
-  Eterm *old_heap;
-  Uint16 gen_gcs;   /* Number of (minor) generational GCs. */
-  Uint16 max_gen_gcs;   /* Max minor gen GCs before fullsweep. */
-  ErlOffHeap off_heap;  /* Off-heap data updated by copy_struct(). */
-  ErlHeapFragment *mbuf;  /* Pointer to message buffer list */
-  Uint mbuf_sz;   /* Size of all message buffers */
-  ErtsPSD *psd;   /* Rarely used process specific data */
+  //Eterm *high_water;
+  //Eterm *old_hend;            /* Heap pointers for generational GC. */
+  //Eterm *old_htop;
+  //Eterm *old_heap;
+  //Uint16 gen_gcs;   /* Number of (minor) generational GCs. */
+  //Uint16 max_gen_gcs;   /* Max minor gen GCs before fullsweep. */
+  //ErlOffHeap off_heap;  /* Off-heap data updated by copy_struct(). */
+  //ErlHeapFragment *mbuf;  /* Pointer to message buffer list */
+  //Uint mbuf_sz;   /* Size of all message buffers */
+  //ErtsPSD *psd;   /* Rarely used process specific data */
 
-  Uint64 bin_vheap_sz;  /* Virtual heap block size for binaries */
-  Uint64 bin_vheap_mature;  /* Virtual heap block size for binaries */
-  Uint64 bin_old_vheap_sz;  /* Virtual old heap block size for binaries */
-  Uint64 bin_old_vheap; /* Virtual old heap size for binaries */
+  //Uint64 bin_vheap_sz;  /* Virtual heap block size for binaries */
+  //Uint64 bin_vheap_mature;  /* Virtual heap block size for binaries */
+  //Uint64 bin_old_vheap_sz;  /* Virtual old heap block size for binaries */
+  //Uint64 bin_old_vheap; /* Virtual old heap size for binaries */
 
-  ErtsProcSysTaskQs *sys_task_qs;
+  //ErtsProcSysTaskQs *sys_task_qs;
 
-  erts_smp_atomic32_t state;  /* Process state flags (see ERTS_PSFLG_*) */
+  //erts_smp_atomic32_t state;  /* Process state flags (see ERTS_PSFLG_*) */
 
-#ifdef ERTS_SMP
+/*#ifdef ERTS_SMP
   ErlMessageInQueue msg_inq;
   ErtsPendExit pending_exit;
   erts_proc_lock_t lock;
@@ -126,34 +126,34 @@ pub struct Process {
 #ifdef HIPE
   struct hipe_process_state_smp hipe_smp;
 #endif
-#endif
+#endif*/
 
-#ifdef CHECK_FOR_HOLES
-  Eterm *last_htop;   /* No need to scan the heap below this point. */
-  ErlHeapFragment *last_mbuf; /* No need to scan beyond this mbuf. */
-#endif
+//#ifdef CHECK_FOR_HOLES
+//  Eterm *last_htop;   /* No need to scan the heap below this point. */
+//  ErlHeapFragment *last_mbuf; /* No need to scan beyond this mbuf. */
+//#endif
 
-#ifdef DEBUG
-  Eterm *last_old_htop; /*
-         * No need to scan the old heap below this point
-         * when looking for invalid pointers into the new heap or
-         * heap fragments.
-         */
-#endif
+//#ifdef DEBUG
+//  Eterm *last_old_htop;
+         // No need to scan the old heap below this point
+         // when looking for invalid pointers into the new heap or
+         // heap fragments.
+//#endif
 
-#ifdef FORCE_HEAP_FRAGS
-  Uint space_verified;        /* Avoid HAlloc forcing heap fragments when */
-  Eterm *space_verified_from; /* we rely on available heap space (TestHeap) */
-#endif
+//#ifdef FORCE_HEAP_FRAGS
+//  Uint space_verified;        /* Avoid HAlloc forcing heap fragments when */
+//  Eterm *space_verified_from; /* we rely on available heap space (TestHeap) */
+//#endif
 }
 
 #[allow(dead_code)]
 pub struct ProcessTable {
   entries: HashMap<Pid, Process>
 }
+pub type Table = ProcessTable;
 
-impl AtomTable {
-  pub fn new() -> AtomTable {
-    AtomTable{ entries: TreeSet::new(), }
+impl ProcessTable {
+  pub fn new() -> ProcessTable {
+    ProcessTable{ entries: HashMap::new(), }
   }
 }
