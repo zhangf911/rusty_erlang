@@ -161,16 +161,17 @@ pub fn first_process_otp(state: &mut world::Erts,
     Ok(_export) => {}
   }
 
-  let args = vec! [term::NIL, state.init.args];
-  let mut p = Process::new(term::NIL, start_mod, state.atoms.am_start, & args);
+  let mut p     = Process::new(box term::Eterm::Nil);
+  let args_vec  = vec! [term::Eterm::Nil,];
+  let args      = box p.heap.make_list(&args_vec, &mut state.terms);
+  p.jump(start_mod, state.atoms.am_start, args);
   return Ok(())
 }
 
 impl Process {
   // Creates new process with given Mod,Fun,Args. Process is not registered or
   // started anywhere yet.
-  pub fn new(parent: term::Eterm,
-             m: term::Eterm, f: term::Eterm, a: &Vec<term::Eterm>) -> Process
+  pub fn new(parent: Box<term::Eterm>) -> Process
   {
     Process{
       heap:       term_heap::Heap::new(),
@@ -180,8 +181,14 @@ impl Process {
       dictionary:     HashMap::new(),
       initial:        beam::make_empty_code(),      // fill this
       current:        beam::Pointer::new_empty(),   // fill this
-      parent:         parent,
+      parent:         parent.get_pid(),
       approx_started: 0,      // fill this
     }
+  }
+
+  // Begins execution from given m:f, with args a
+  pub fn jump(&mut self, m: Box<term::Eterm>, f: Box<term::Eterm>,
+              a: Box<term::Eterm>)
+  {
   }
 }

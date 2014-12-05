@@ -116,11 +116,12 @@ fn _make_header(sz: Uint, tag: Uint) -> Uint {
 //
 // NIL access methods
 //
-pub const NIL: Uint = (!0 << _TAG_IMMED2_SIZE) | _TAG_IMMED2_NIL;
+/*pub const NIL: Uint = (!0 << _TAG_IMMED2_SIZE) | _TAG_IMMED2_NIL;
 #[inline(always)]
 pub fn is_nil(x: Eterm) -> bool {
   return x == NIL;
 }
+*/
 
 const MAX_ATOM_INDEX: Uint = !(!0 << (UINT_SIZEOF*8 - _TAG_IMMED2_SIZE));
 
@@ -128,36 +129,76 @@ const MAX_ATOM_INDEX: Uint = !(!0 << (UINT_SIZEOF*8 - _TAG_IMMED2_SIZE));
 // atom access methods
 //
 #[inline(always)]
-pub fn make_atom(x: Uint) -> Uint {
-  return (x << _TAG_IMMED2_SIZE) + _TAG_IMMED2_ATOM;
+pub fn make_atom(x: uint) -> uint {
+  return (x << _TAG_IMMED2_SIZE) + _TAG_IMMED2_ATOM as uint;
 }
 #[inline(always)]
-pub fn is_atom(x: Eterm) -> bool {
+pub fn is_atom(x: Uint) -> bool {
   return ((x) & _TAG_IMMED2_MASK) == _TAG_IMMED2_ATOM;
 }
 #[inline(always)]
-fn _unchecked_atom_val(x: Eterm) -> Uint {
+fn _unchecked_atom_val(x: Uint) -> Uint {
   return x >> _TAG_IMMED2_SIZE;
 }
 //_ET_DECLARE_CHECKED(Uint, atom_val, Eterm)
 //#define atom_val(x) _ET_APPLY(atom_val,(x))
 
 // TODO: Redo following Eterm* types with byte-precision on the heap
+#[deriving(Eq)]
 pub struct EtermList {
   value: Box<Eterm>,
   tail:  Box<Eterm>,
 }
+impl PartialEq for EtermList {
+  fn eq(&self, other: &EtermList) -> bool {
+    self.value == other.value && self.tail == other.tail
+  }
+}
+impl Hash for EtermList {
+  fn hash(&self, state: &mut SipState) {
+    self.value.hash(state);
+    self.tail.hash(state);
+  }
+}
 
+#[deriving(Eq)]
 pub struct EtermBinary {
   bytes: Vec<u8>,
 }
+impl PartialEq for EtermBinary {
+  fn eq(&self, other: &EtermBinary) -> bool {
+    self.bytes == other.bytes
+  }
+}
+impl Hash for EtermBinary {
+  fn hash(&self, state: &mut SipState) {
+    self.bytes.hash(state);
+  }
+}
 
+#[deriving(Eq)]
 pub struct EtermTuple {
   values: Box<Vec<Eterm>>,
 }
+impl PartialEq for EtermTuple {
+  fn eq(&self, other: &EtermTuple) -> bool {
+    self.values == other.values
+  }
+}
+impl Hash for EtermTuple {
+  fn hash(&self, state: &mut SipState) {
+    self.values.hash(state);
+  }
+}
 
+#[deriving(Eq)]
 pub struct EtermPid {
   pid:    Pid,
+}
+impl PartialEq for EtermPid {
+  fn eq(&self, other: &EtermPid) -> bool {
+    self.pid == other.pid
+  }
 }
 
 // Erlang Term, which is bit combination for special values
@@ -174,30 +215,48 @@ pub enum Eterm {
   Binary(EtermBinary),
   Atom(uint),
   Integer(Sint), // TODO: Split into machine int and bigint
-  Float(f64),
+  //Float(f64),
   Pid(EtermPid)
 }
 
 impl Eterm {
-  pub fn get_atom(&self) -> Option<uint> {
-    match *self { Eterm::Atom(u) => return Some(u) }
-    return None
+  pub fn get_atom(&self) -> uint {
+    match *self {
+      Eterm::Atom(u) => return u,
+      _              => panic!("Eterm::get_atom not an atom")
+    }
+  }
+  pub fn get_pid(&self) -> Pid {
+    match *self {
+      Eterm::Pid(p) => return p.pid,
+      _             => panic!("Eterm::get_pid not a pid")
+    }
   }
 }
 
 impl PartialEq for Eterm {
   fn eq(&self, other: &Eterm) -> bool {
     match (*self, *other) {
-      (Eterm::Nil, Eterm::Nil) => return true,
+      (Eterm::Nil, Eterm::Nil)                => true,
+      (Eterm::Pid(a), Eterm::Pid(b))          => a.pid == b.pid,
+      (Eterm::Atom(a), Eterm::Atom(b))        => a == b,
+      (Eterm::Integer(a), Eterm::Integer(b))  => a == b,
+      (Eterm::Tuple(a), Eterm::Tuple(b))      => a == b,
+      (Eterm::List(a), Eterm::List(b))        => a == b,
+      _                                       => false,
     }
-    false
   }
 }
 impl Hash for Eterm {
   fn hash(&self, state: &mut SipState) {
     match *self {
-      Eterm::Nil     => 0.hash(state),
-      Eterm::Atom(u) => make_atom(u as u64).hash(state),
+      Eterm::Nil        => 0_u64.hash(state),
+      Eterm::Atom(u)    => make_atom(u).hash(state),
+      Eterm::Pid(p)     => p.pid.hash(state),
+      Eterm::Integer(i) => i.hash(state),
+      Eterm::List(l)    => l.hash(state),
+      Eterm::Tuple(t)   => t.hash(state),
+      Eterm::Binary(b)  => b.hash(state),
     }
   }
 }

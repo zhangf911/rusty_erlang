@@ -10,7 +10,7 @@ pub type Sword = Sint;
 // refers to existing Eterm in some heap
 // TODO: refer to some eterm heap + offset?
 pub type EtermPtr  = Uint;
-pub type MFA = (term::Eterm, term::Eterm, uint);
+pub type MFA = (Box<term::Eterm>, Box<term::Eterm>, uint);
 
 pub type Pid = Uint;
 

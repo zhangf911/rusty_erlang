@@ -19,7 +19,7 @@ pub struct Erts {
   clock:      Uint,
   pub code_ix:  CodeIndex,
   // Term index maps Eterm value range to heaps of processes
-  terms:      term_heap::EtermIndex,
+  pub terms:      term_heap::EtermIndex,
 }
 
 impl Erts {
@@ -43,7 +43,7 @@ impl Erts {
   }
 
   pub fn find_exported_fun(&self,
-                          m: term::Eterm, f: term::Eterm, a: uint,
+                          m: Box<term::Eterm>, f: Box<term::Eterm>, a: uint,
                           code_ix: uint)
       -> Result<export::Export, ()> {
     match self.exports[code_ix].find(&(m, f, a)) {
