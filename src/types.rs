@@ -20,6 +20,7 @@ pub type Eterm     = Uint;
 // refers to existing Eterm in some heap
 // TODO: refer to some eterm heap + offset?
 pub type EtermPtr  = Uint;
+pub type MFA = (Eterm, Eterm, uint);
 
 pub type Pid = Uint;
 

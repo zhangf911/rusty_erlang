@@ -1,6 +1,5 @@
 use std::collections::HashMap;
-use types::{Pid};
-use atom::{Atom};
+use types::{Pid, Eterm};
 
 #[allow(dead_code)]
 enum RegItem {
@@ -10,7 +9,7 @@ enum RegItem {
 
 #[allow(dead_code)]
 pub struct ProcessRegistry {
-  entries: HashMap<Atom, RegItem>
+  entries: HashMap<Eterm, RegItem>
 }
 pub type Table = ProcessRegistry;
 

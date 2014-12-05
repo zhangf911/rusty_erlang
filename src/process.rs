@@ -159,8 +159,14 @@ impl ProcessTable {
   }
 }
 
-fn first_process_otp(state: &mut world::State, mod_name: String,
+fn first_process_otp(state: &mut world::Erts, mod_name: String,
                      code: Option<BeamCode>, args: Vec<String>)
+                     -> Result<(), String>
 {
   let start_mod = state.atoms.put(&mod_name);
+  match state.find_exported_fun(start_mod, state.atoms.am_start, 2,
+                                state.code_ix.get_active()) {
+    Err(())    => return Err("No function ".to_string() + mod_name + ":start/2"),
+    Ok(export) => return Ok(())
+  }
 }

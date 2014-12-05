@@ -8,5 +8,5 @@ enum AllocatorStrategyType {
   AOFirstFit,
 }
 
-pub fn init(_args: &Vec<String>, _state: &mut world::State) {
+pub fn init(_args: &Vec<String>, _state: &mut world::Erts) {
 }

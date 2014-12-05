@@ -33,7 +33,7 @@ impl ErlInit {
   }
 }
 
-pub fn start(args: &Vec<String>) -> Result<world::State, ()>
+pub fn start(args: &Vec<String>) -> Result<world::Erts, ()>
 {
   let mut i: uint = 1;
   let mut init = ErlInit::new();
@@ -68,7 +68,7 @@ pub fn start(args: &Vec<String>) -> Result<world::State, ()>
     i += 1;
   }
 
-  let mut state: world::State = world::State::new(init);
+  let mut state: world::Erts = world::Erts::new(init);
   alloc::init(args, &mut state);
   erl_init(&mut state);
   return Ok(state);
@@ -96,6 +96,6 @@ fn get_arg(args: &Vec<String>, i: &mut uint) -> Result<String, ()> {
   return Err(());
 }
 
-fn erl_init(_state: &mut world::State) {
+fn erl_init(_state: &mut world::Erts) {
 
 }
