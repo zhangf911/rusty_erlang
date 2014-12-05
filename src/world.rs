@@ -1,4 +1,5 @@
 use {atom, beam_op, erl_init, export, fun, module, process, process_reg};
+use {term_heap};
 use types::{Uint, Eterm};
 use code_index::{CodeIndex};
 
@@ -16,6 +17,8 @@ pub struct Erts {
   preg:       process_reg::Table,
   clock:      Uint,
   pub code_ix:  CodeIndex,
+  // Term index maps Eterm value range to heaps of processes
+  terms:      term_heap::EtermIndex,
 }
 
 impl Erts {
@@ -34,6 +37,7 @@ impl Erts {
       preg:       process_reg::ProcessRegistry::new(),
       processes:  process::ProcessTable::new(),
       code_ix:    CodeIndex::new(),
+      terms:      term_heap::new_eterm_index(),
     }
   }
 

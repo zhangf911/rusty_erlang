@@ -1,4 +1,5 @@
-use types::{Eterm, Uint, UINT_SIZEOF};
+use types::{Eterm, Uint, Sint, UINT_SIZEOF, Pid};
+//use num::bigint;
 
 const _TAG_PRIMARY_SIZE: uint = 2;   // bits
 const _TAG_PRIMARY_MASK: Uint = 0x3;
@@ -109,8 +110,10 @@ fn _make_header(sz: Uint, tag: Uint) -> Eterm {
   return (sz << _HEADER_ARITY_OFFS) + tag;
 }
 
-/* NIL access methods */
-const NIL: Uint = (!0 << _TAG_IMMED2_SIZE) | _TAG_IMMED2_NIL;
+//
+// NIL access methods
+//
+pub const NIL: Uint = (!0 << _TAG_IMMED2_SIZE) | _TAG_IMMED2_NIL;
 #[inline(always)]
 pub fn is_nil(x: Eterm) -> bool {
   return x == NIL;
@@ -118,7 +121,9 @@ pub fn is_nil(x: Eterm) -> bool {
 
 const MAX_ATOM_INDEX: Uint = !(!0 << (UINT_SIZEOF*8 - _TAG_IMMED2_SIZE));
 
-/* atom access methods */
+//
+// atom access methods
+//
 #[inline(always)]
 pub fn make_atom(x: Uint) -> Eterm {
   return (x << _TAG_IMMED2_SIZE) + _TAG_IMMED2_ATOM;
@@ -133,3 +138,25 @@ fn _unchecked_atom_val(x: Eterm) -> Uint {
 }
 //_ET_DECLARE_CHECKED(Uint, atom_val, Eterm)
 //#define atom_val(x) _ET_APPLY(atom_val,(x))
+
+// TODO: Redo this with byte-precision on the heap
+pub struct EtermList {
+  value: Box<EtermValue>,
+  tail:  Box<EtermValue>,
+}
+
+pub type EtermBinary = Vec<u8>;
+
+pub struct EtermTuple {
+  values: Box<Vec<EtermValue>>,
+}
+
+pub enum EtermValue {
+  List(EtermList),
+  Tuple(EtermTuple),
+  Binary(EtermBinary),
+  Atom(Eterm),
+  Integer(Sint), // TODO: Split into machine int and bigint
+  Float(f64),
+  Pid(Pid)
+}

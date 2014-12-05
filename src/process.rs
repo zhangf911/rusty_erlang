@@ -1,34 +1,22 @@
 use std::collections::{HashMap};
 use types::{Uint, Sint, Eterm, ApproxTime, Pid};
-use beam;
-use world;
+use {beam, world, term, term_heap, message};
 
 pub type ProcDict = HashMap<String, Eterm>;
 
-#[allow(dead_code)]
-pub struct MessageQueue {
-  //ErlMessage *first;
-  //ErlMessage **last;  /* point to the last next pointer */
-  //ErlMessage **save;
-  len: Sint,  // queue length
 
-  /*
-   * The following two fields are used by the recv_mark/1 and
-   * recv_set/1 instructions.
-   */
-  //BeamInstr *mark;    /* address to rec_loop/2 instruction */
-  //ErlMessage **saved_last;  /* saved last pointer */
-}
 
 #[allow(dead_code)]
 pub struct Process {
-  heap_top:   Eterm,
-  stack_top:  Eterm,
-  heap_start: Eterm,
-  heap_end:   Eterm,
-  heap_sz:    Uint,     // heap size in words
-  min_heap_size: Uint,  // Minimum size of heap (in words)
-  min_vheap_size: Uint, // Minimum size of virtual heap (in words)
+  // TODO: heap & gc
+  heap:   term_heap::Heap,
+  //heap_top:   Eterm,
+  //stack_top:  Eterm,
+  //heap_start: Eterm,
+  //heap_end:   Eterm,
+  //heap_sz:    Uint,     // heap size in words
+  //min_heap_size: Uint,  // Minimum size of heap (in words)
+  //min_vheap_size: Uint, // Minimum size of virtual heap (in words)
 
   //
   // Saved x registers.
@@ -61,7 +49,7 @@ pub struct Process {
   //ErtsSuspendMonitor *suspend_monitors; // Processes suspended by this process
                                           // via erlang:suspend_process/1
 
-  msg: MessageQueue,
+  msg: message::Queue,
 
   //union {
   //  ErtsBifTimer *bif_timers; /* Bif timers aiming at this process */
@@ -90,7 +78,7 @@ pub struct Process {
   //
   // Information mainly for post-mortem use (erl crash dump)
   //
-  parent: Eterm,   // Pid of process that created this process
+  parent:         Pid,   // Pid of process that created this process
   approx_started: ApproxTime, // Time when started
 
   /* This is the place, where all fields that differs between memory
@@ -170,5 +158,26 @@ pub fn first_process_otp(state: &mut world::Erts,
                                 state.code_ix.get_active()) {
     Err(())    => return Err("No function ".to_string() + mod_name + ":start/2"),
     Ok(_export) => return Ok(())
+  }
+
+  let args = vec! [term::NIL];
+  let mut p = Process::new(term::NIL, start_mod, state.atoms.am_start, & args);
+}
+
+impl Process {
+  // Creates new process with given Mod,Fun,Args. Process is not registered or
+  // started anywhere yet.
+  pub fn new(parent: Eterm, m: Eterm, f: Eterm, a: &Vec<Eterm>) -> Process {
+    Process{
+      heap:       term_heap::Heap::new(),
+      cp:         beam::Pointer::new_empty(),
+      i:          beam::Pointer::new_empty(),
+      msg:        message::Queue::new(),
+      dictionary:     HashMap::new(),
+      initial:        beam::make_empty_code(),      // fill this
+      current:        beam::Pointer::new_empty(),   // fill this
+      parent:         parent,
+      approx_started: 0,      // fill this
+    }
   }
 }

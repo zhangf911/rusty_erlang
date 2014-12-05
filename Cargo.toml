@@ -4,5 +4,8 @@ name = "rusty_erl"
 version = "18.0.0"
 authors = ["Dmytro Lytovchenko <dmytro.lytovchenko@gmail.com>"]
 
+[dependencies]
+num = "*"
+
 [[bin]]
 name = "rusty_erl"

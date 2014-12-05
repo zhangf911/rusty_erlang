@@ -1,5 +1,6 @@
 //#![crate_id = "rusty_erlang#18.0"]
 #[allow(unused_variables)]
+//extern crate num;
 use std::os;
 
 mod alloc;
@@ -10,10 +11,12 @@ mod code_index;
 mod erl_init;
 mod export;
 mod fun;
+mod message;
 mod module;
 mod process;
 mod process_reg;
 mod term;
+mod term_heap;
 mod types;
 mod world;
 
