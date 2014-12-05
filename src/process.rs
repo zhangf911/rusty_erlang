@@ -1,9 +1,9 @@
 use std::collections::{HashMap};
-use types::{Uint, Sint, Eterm, ApproxTime, Pid};
+use types::{ApproxTime, Pid};
 use {beam, world, term, term_heap, message};
 
-pub type ProcDict = HashMap<String, Eterm>;
-
+// Keys and values are any eterm
+pub type ProcDict = HashMap<term::Eterm, term::Eterm>;
 
 
 #[allow(dead_code)]
@@ -148,6 +148,7 @@ impl ProcessTable {
   }
 }
 
+// Locates start_mod module and spawns root process for the whole thing.
 pub fn first_process_otp(state: &mut world::Erts,
                      mod_name: String,
                      _code: Option<beam::Code>)
@@ -157,17 +158,20 @@ pub fn first_process_otp(state: &mut world::Erts,
   match state.find_exported_fun(start_mod, state.atoms.am_start, 2,
                                 state.code_ix.get_active()) {
     Err(())    => return Err("No function ".to_string() + mod_name + ":start/2"),
-    Ok(_export) => return Ok(())
+    Ok(_export) => {}
   }
 
-  let args = vec! [term::NIL];
+  let args = vec! [term::NIL, state.init.args];
   let mut p = Process::new(term::NIL, start_mod, state.atoms.am_start, & args);
+  return Ok(())
 }
 
 impl Process {
   // Creates new process with given Mod,Fun,Args. Process is not registered or
   // started anywhere yet.
-  pub fn new(parent: Eterm, m: Eterm, f: Eterm, a: &Vec<Eterm>) -> Process {
+  pub fn new(parent: term::Eterm,
+             m: term::Eterm, f: term::Eterm, a: &Vec<term::Eterm>) -> Process
+  {
     Process{
       heap:       term_heap::Heap::new(),
       cp:         beam::Pointer::new_empty(),

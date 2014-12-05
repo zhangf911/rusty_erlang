@@ -2,7 +2,7 @@ use term;
 
 #[allow(dead_code)]
 pub struct Queue {
-  items:  Vec<term::EtermValue>,
+  items:  Vec<term::Eterm>,
   //ErlMessage *first;
   //ErlMessage **last;  /* point to the last next pointer */
   //ErlMessage **save;

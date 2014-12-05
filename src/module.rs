@@ -1,5 +1,6 @@
 use std::collections::HashMap;
-use types::{Eterm, Uint};
+use types::{Uint};
+use term;
 use beam;
 
 #[allow(dead_code)]
@@ -14,7 +15,7 @@ pub struct ModuleInstance {
 
 #[allow(dead_code)]
 pub struct Module {
-  module: Eterm,        // Atom for module (not tagged) TODO: Use Eterm?
+  module: term::Eterm,  // Atom for module (not tagged) TODO: Use Eterm?
 
   curr: ModuleInstance,
   old: ModuleInstance,  // protected by "old_code" rwlock

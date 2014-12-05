@@ -1,6 +1,7 @@
 use {atom, beam_op, erl_init, export, fun, module, process, process_reg};
 use {term_heap};
-use types::{Uint, Eterm};
+use types::{Uint};
+use term;
 use code_index::{CodeIndex};
 
 // Global runtime configuration, atoms, tables and so on
@@ -41,7 +42,9 @@ impl Erts {
     }
   }
 
-  pub fn find_exported_fun(&self, m: Eterm, f: Eterm, a: uint, code_ix: uint)
+  pub fn find_exported_fun(&self,
+                          m: term::Eterm, f: term::Eterm, a: uint,
+                          code_ix: uint)
       -> Result<export::Export, ()> {
     match self.exports[code_ix].find(&(m, f, a)) {
       Ok(export) => {

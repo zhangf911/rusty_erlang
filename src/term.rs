@@ -1,4 +1,7 @@
-use types::{Eterm, Uint, Sint, UINT_SIZEOF, Pid};
+use types::{Uint, Sint, UINT_SIZEOF, Pid};
+use std::cmp::{Eq, PartialEq};
+use std::hash::Hash;
+use std::hash::sip::SipState;
 //use num::bigint;
 
 const _TAG_PRIMARY_SIZE: uint = 2;   // bits
@@ -101,12 +104,12 @@ const _HEADER_SUBTAG_MASK: Uint = 0x3C;  // 4 bits for subtag
 const _HEADER_ARITY_OFFS: uint = 6; // bits
 
 #[inline(always)]
-pub fn non_value() -> Eterm {
+pub fn non_value() -> Uint {
   return _make_header(!0, _TAG_HEADER_FLOAT);
 }
 
 #[inline(always)]
-fn _make_header(sz: Uint, tag: Uint) -> Eterm {
+fn _make_header(sz: Uint, tag: Uint) -> Uint {
   return (sz << _HEADER_ARITY_OFFS) + tag;
 }
 
@@ -125,7 +128,7 @@ const MAX_ATOM_INDEX: Uint = !(!0 << (UINT_SIZEOF*8 - _TAG_IMMED2_SIZE));
 // atom access methods
 //
 #[inline(always)]
-pub fn make_atom(x: Uint) -> Eterm {
+pub fn make_atom(x: Uint) -> Uint {
   return (x << _TAG_IMMED2_SIZE) + _TAG_IMMED2_ATOM;
 }
 #[inline(always)]
@@ -139,24 +142,62 @@ fn _unchecked_atom_val(x: Eterm) -> Uint {
 //_ET_DECLARE_CHECKED(Uint, atom_val, Eterm)
 //#define atom_val(x) _ET_APPLY(atom_val,(x))
 
-// TODO: Redo this with byte-precision on the heap
+// TODO: Redo following Eterm* types with byte-precision on the heap
 pub struct EtermList {
-  value: Box<EtermValue>,
-  tail:  Box<EtermValue>,
+  value: Box<Eterm>,
+  tail:  Box<Eterm>,
 }
 
-pub type EtermBinary = Vec<u8>;
+pub struct EtermBinary {
+  bytes: Vec<u8>,
+}
 
 pub struct EtermTuple {
-  values: Box<Vec<EtermValue>>,
+  values: Box<Vec<Eterm>>,
 }
 
-pub enum EtermValue {
+pub struct EtermPid {
+  pid:    Pid,
+}
+
+// Erlang Term, which is bit combination for special values
+// Eterm is used as index in EtermIndex, which is a global hashmap for whole
+// Erts system (a way to mimic integer/pointer conversion in C BEAM engine).
+// Entries in EtermIndex refer to a value stored in some separate process heap.
+// Heap stores EtermValues which are Rust enums of several possible types
+// (which is a way to mimic "polymorphic" memory structure of Erlang values)
+#[deriving(Eq)]
+pub enum Eterm {
+  Nil,
   List(EtermList),
   Tuple(EtermTuple),
   Binary(EtermBinary),
-  Atom(Eterm),
+  Atom(uint),
   Integer(Sint), // TODO: Split into machine int and bigint
   Float(f64),
-  Pid(Pid)
+  Pid(EtermPid)
+}
+
+impl Eterm {
+  pub fn get_atom(&self) -> Option<uint> {
+    match *self { Eterm::Atom(u) => return Some(u) }
+    return None
+  }
+}
+
+impl PartialEq for Eterm {
+  fn eq(&self, other: &Eterm) -> bool {
+    match (*self, *other) {
+      (Eterm::Nil, Eterm::Nil) => return true,
+    }
+    false
+  }
+}
+impl Hash for Eterm {
+  fn hash(&self, state: &mut SipState) {
+    match *self {
+      Eterm::Nil     => 0.hash(state),
+      Eterm::Atom(u) => make_atom(u as u64).hash(state),
+    }
+  }
 }
