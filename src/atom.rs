@@ -11,7 +11,7 @@ pub struct AtomTable {
   // maps atom name to Eterm
   entries:  HashMap<String, Eterm>,
 
-  am_start: Eterm,
+  pub am_start: Eterm,
 }
 pub type Table = AtomTable;
 

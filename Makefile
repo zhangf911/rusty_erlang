@@ -1,4 +1,5 @@
 .PHONY: all
 
 all:
-	cargo build --verbose
+	rustc -A dead-code src/rusty_erl.rs
+#	cargo build --verbose

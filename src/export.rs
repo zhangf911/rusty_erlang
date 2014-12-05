@@ -1,11 +1,14 @@
 use std::collections::HashMap;
 use code_index::{NUM_CODE_IX};
-use types::{BeamInstr, BeamPtr, MFA};
+use types::{MFA};
+use beam;
 
 #[allow(dead_code)]
+#[deriving(Clone)]
 pub struct Export {
   // Pointer to code for function
-  addressv: Vec<BeamPtr>,
+  pub addressv: Vec<beam::Pointer>,
+
   // code[0]: Tagged atom for module.
   // code[1]: Tagged atom for function.
   // code[2]: Arity (untagged integer).
@@ -18,7 +21,7 @@ pub struct Export {
   //    on_load function that has not been run yet, or pointer
   //         to code for function code[3] is a breakpont instruction.
   //    Otherwise: 0.
-  code:   Vec<BeamInstr>,
+  pub code:   beam::Code,
 }
 
 #[allow(dead_code)]
@@ -34,10 +37,10 @@ impl ExportTable {
     }
   }
 
-  pub fn find(&mut self, key: &MFA) -> Result<Export, ()> {
+  pub fn find(&self, key: &MFA) -> Result<Export, ()> {
     if !self.entries.contains_key(key) {
       return Err(());
     }
-    return Ok(self.entries[*key]);
+    return Ok(self.entries[*key].clone());
   }
 }

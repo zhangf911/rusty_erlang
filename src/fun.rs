@@ -1,12 +1,13 @@
 use std::collections::HashMap;
 use std::sync::atomic::AtomicInt;
-use types::{Uint, Eterm, BeamPtr};
+use types::{Uint, Eterm};
+use beam;
 
 #[allow(dead_code)]
 pub struct FunEntry {
-  module_md5: String,   // md5 for module
-  index:      Uint,     // new style index
-  address:    BeamPtr,  // pointer to code for fun
+  module_md5: String,         // md5 for module
+  index:      Uint,           // new style index
+  address:    beam::Pointer,  // pointer to code for fun
   arity:      Uint,
   module:     Eterm,    // tagged atom for module
   refc:       AtomicInt, // Reference count: One for code + one for each

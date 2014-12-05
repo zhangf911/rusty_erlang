@@ -1,4 +1,4 @@
-use {atom, beam, erl_init, export, fun, module, process, process_reg};
+use {atom, beam, beam_op, erl_init, export, fun, module, process, process_reg};
 use types::{Uint, Eterm};
 use code_index::{CodeIndex, NUM_CODE_IX};
 //use export::ExportTable;
@@ -6,7 +6,7 @@ use code_index::{CodeIndex, NUM_CODE_IX};
 // Global runtime configuration, atoms, tables and so on
 #[allow(dead_code)]
 pub struct Erts {
-  erl_init:   erl_init::ErlInit,
+  pub init:   erl_init::ErlInit,
 
   pub atoms:  atom::Table,
   funs:       fun::Table,
@@ -22,7 +22,7 @@ pub struct Erts {
 impl Erts {
   pub fn new(init: erl_init::ErlInit) -> Erts {
     Erts{
-      erl_init:   init,
+      init:       init, // startup params and command line args
 
       atoms:      atom::AtomTable::new(),
       funs:       fun::FunTable::new(),
@@ -42,13 +42,13 @@ impl Erts {
       -> Result<export::Export, ()> {
     match self.exports[code_ix].find(&(m, f, a)) {
       Ok(export) => {
-          if export.addressv[code_ix] == export.code + 3
-            && export.code[3] != beam::op_i_generic_breakpoint {
+          if export.addressv[code_ix].equals(&export.code, 3)
+            && export.code[3] != beam_op::op_i_generic_breakpoint {
             return Err(());
           }
           return Ok(export)
         },
-      Err(()) => Err
+      Err(()) => Err(())
     }
   }
 }

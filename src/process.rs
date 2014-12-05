@@ -1,5 +1,6 @@
 use std::collections::{HashMap};
-use types::{Uint, Sint, Eterm, ApproxTime, BeamPtr, BeamInstr, BeamCode, Pid};
+use types::{Uint, Sint, Eterm, ApproxTime, Pid};
+use beam;
 use world;
 
 pub type ProcDict = HashMap<String, Eterm>;
@@ -38,8 +39,8 @@ pub struct Process {
   //unsigned max_arg_reg; /* Maximum number of argument registers available. */
   //Eterm def_arg_reg[6]; /* Default array for argument registers. */
 
-  cp: BeamPtr,   // (untagged) Continuation pointer (for threaded code)
-  i:  BeamPtr,   // Program counter for threaded code
+  cp: beam::Pointer,   // (untagged) Continuation pointer (for threaded code)
+  i:  beam::Pointer,   // Program counter for threaded code
   //Sint catches;   // Number of catches on stack
   //Sint fcalls;    // Number of reductions left to execute
                     // Only valid for the current process
@@ -79,12 +80,12 @@ pub struct Process {
 //#endif
   //Initial module(0), function(1), arity(2), often used instead
   //of pointer to funcinfo instruction, hence the BeamInstr datatype
-  initial: Vec<BeamInstr>,
+  initial: beam::Code,
   // Current Erlang function, part of the funcinfo:
   // module(0), function(1), arity(2)
   // (module and functions are tagged atoms;
   // arity an untagged integer). BeamInstr * because it references code
-  current: BeamPtr,
+  current: beam::Pointer,
 
   //
   // Information mainly for post-mortem use (erl crash dump)
@@ -159,8 +160,9 @@ impl ProcessTable {
   }
 }
 
-fn first_process_otp(state: &mut world::Erts, mod_name: String,
-                     code: Option<BeamCode>, args: Vec<String>)
+pub fn first_process_otp(state: &mut world::Erts,
+                     mod_name: String,
+                     code: Option<beam::Code>)
                      -> Result<(), String>
 {
   let start_mod = state.atoms.put(&mod_name);

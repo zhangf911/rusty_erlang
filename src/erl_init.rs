@@ -1,4 +1,5 @@
 use alloc;
+use process;
 use world;
 
 static EMULATOR_TYPE: &'static str = "Rusty BEAM";
@@ -9,9 +10,10 @@ static ERTS_DEFAULT_MAX_PORTS: uint = 1 << 18;
 // Core configuration and global variables for erts
 #[allow(dead_code)]
 pub struct ErlInit {
+  args:               Vec<String>, // does this belong to world::Erts state?
   erts_no_crash_dump: bool,
-  erts_init_module: String,
-  erts_init_fun: String,
+  erts_init_module:   String,
+  erts_init_fun:      String,
 
   ncpu:                     uint,
   proc_tab_sz:              uint,
@@ -20,8 +22,9 @@ pub struct ErlInit {
 }
 
 impl ErlInit {
-  pub fn new() -> ErlInit {
+  pub fn new(args: &Vec<String>) -> ErlInit {
 	  ErlInit {
+	    args: args.clone(),
 	    erts_no_crash_dump: false,
 	    erts_init_module: "init".to_string(),
 	    erts_init_fun: "boot".to_string(),
@@ -36,7 +39,7 @@ impl ErlInit {
 pub fn start(args: &Vec<String>) -> Result<world::Erts, ()>
 {
   let mut i: uint = 1;
-  let mut init = ErlInit::new();
+  let mut init = ErlInit::new(args);
 
   while i < args.len() {
     match args[i].as_slice() {
@@ -96,6 +99,8 @@ fn get_arg(args: &Vec<String>, i: &mut uint) -> Result<String, ()> {
   return Err(());
 }
 
-fn erl_init(_state: &mut world::Erts) {
-
+fn erl_init(state: &mut world::Erts) {
+  process::first_process_otp(state,
+                            "otp_ring0".to_string(),
+                            None);
 }

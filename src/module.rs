@@ -1,9 +1,10 @@
 use std::collections::HashMap;
-use types::{BeamPtr, Eterm, Uint};
+use types::{Eterm, Uint};
+use beam;
 
 #[allow(dead_code)]
 pub struct ModuleInstance {
-  code: BeamPtr,
+  code: beam::Pointer,
   code_length: Uint,    // Length of loaded code in bytes
   //catches: Uint,
   //struct erl_module_nif *nif;

@@ -5,6 +5,7 @@ use std::os;
 mod alloc;
 mod atom;
 mod beam;
+mod beam_op;
 mod code_index;
 mod erl_init;
 mod export;

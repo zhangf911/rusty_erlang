@@ -2,6 +2,8 @@
 .project
 .idea
 *.iml
+# rustc target
+rusty_erl
 
 # Compiled files
 *.o
