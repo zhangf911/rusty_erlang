@@ -1,4 +1,4 @@
-use types::{Eterm, Uint, Uint_Sizeof};
+use types::{Eterm, Uint, UINT_SIZEOF};
 
 const _TAG_PRIMARY_SIZE: uint = 2;   // bits
 const _TAG_PRIMARY_MASK: Uint = 0x3;
@@ -100,7 +100,7 @@ const _HEADER_SUBTAG_MASK: Uint = 0x3C;  // 4 bits for subtag
 const _HEADER_ARITY_OFFS: uint = 6; // bits
 
 #[inline(always)]
-pub fn THE_NON_VALUE() -> Eterm {
+pub fn non_value() -> Eterm {
   return _make_header(!0, _TAG_HEADER_FLOAT);
 }
 
@@ -116,7 +116,7 @@ pub fn is_nil(x: Eterm) -> bool {
   return x == NIL;
 }
 
-const MAX_ATOM_INDEX: Uint = !(!0 << (Uint_Sizeof*8 - _TAG_IMMED2_SIZE));
+const MAX_ATOM_INDEX: Uint = !(!0 << (UINT_SIZEOF*8 - _TAG_IMMED2_SIZE));
 
 /* atom access methods */
 #[inline(always)]

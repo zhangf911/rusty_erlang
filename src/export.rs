@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use code_index::{NUM_CODE_IX};
 use types::{MFA};
 use beam;
 

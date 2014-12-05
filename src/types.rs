@@ -1,6 +1,6 @@
 pub type Uint = u64;
 pub type Sint = i64;
-pub const Uint_Sizeof: uint = 8; // bytes
+pub const UINT_SIZEOF: uint = 8; // bytes
 
 pub type Uword = Uint;
 pub type Sword = Sint;

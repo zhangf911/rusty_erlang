@@ -1,7 +1,6 @@
-use {atom, beam, beam_op, erl_init, export, fun, module, process, process_reg};
+use {atom, beam_op, erl_init, export, fun, module, process, process_reg};
 use types::{Uint, Eterm};
-use code_index::{CodeIndex, NUM_CODE_IX};
-//use export::ExportTable;
+use code_index::{CodeIndex};
 
 // Global runtime configuration, atoms, tables and so on
 #[allow(dead_code)]
@@ -43,7 +42,7 @@ impl Erts {
     match self.exports[code_ix].find(&(m, f, a)) {
       Ok(export) => {
           if export.addressv[code_ix].equals(&export.code, 3)
-            && export.code[3] != beam_op::op_i_generic_breakpoint {
+            && export.code[3] != beam_op::OP_I_GENERIC_BREAKPOINT {
             return Err(());
           }
           return Ok(export)
