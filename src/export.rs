@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use types::{MFA};
+use types::{MFArity};
 use beam;
 
 #[allow(dead_code)]
@@ -25,7 +25,7 @@ pub struct Export {
 
 #[allow(dead_code)]
 pub struct ExportTable {
-  entries: HashMap<MFA, Export>
+  entries: HashMap<MFArity, Export>
 }
 pub type Table = ExportTable;
 
@@ -36,10 +36,10 @@ impl ExportTable {
     }
   }
 
-  pub fn find(&self, key: &MFA) -> Result<Export, ()> {
-    if !self.entries.contains_key(key) {
-      return Err(());
+  pub fn find(&self, mfa: &MFArity) -> Option<Export> {
+    if !self.entries.contains_key(mfa) {
+      return None;
     }
-    return Ok(self.entries[*key].clone());
+    return Some(self.entries[*mfa].clone());
   }
 }

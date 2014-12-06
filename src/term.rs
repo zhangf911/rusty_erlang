@@ -236,27 +236,27 @@ impl Eterm {
 
 impl PartialEq for Eterm {
   fn eq(&self, other: &Eterm) -> bool {
-    match (*self, *other) {
-      (Eterm::Nil, Eterm::Nil)                => true,
-      (Eterm::Pid(a), Eterm::Pid(b))          => a.pid == b.pid,
-      (Eterm::Atom(a), Eterm::Atom(b))        => a == b,
-      (Eterm::Integer(a), Eterm::Integer(b))  => a == b,
-      (Eterm::Tuple(a), Eterm::Tuple(b))      => a == b,
-      (Eterm::List(a), Eterm::List(b))        => a == b,
-      _                                       => false,
+    match (self, other) {
+      (&Eterm::Nil, &Eterm::Nil)                => true,
+      (&Eterm::Pid(a), &Eterm::Pid(b))          => a.pid == b.pid,
+      (&Eterm::Atom(a), &Eterm::Atom(b))        => a == b,
+      (&Eterm::Integer(a), &Eterm::Integer(b))     => a == b,
+      (&Eterm::Tuple(ref a), &Eterm::Tuple(ref b)) => *a == *b,
+      (&Eterm::List(ref a), &Eterm::List(ref b))   => *a == *b,
+      _ => false,
     }
   }
 }
 impl Hash for Eterm {
   fn hash(&self, state: &mut SipState) {
-    match *self {
-      Eterm::Nil        => 0_u64.hash(state),
-      Eterm::Atom(u)    => make_atom(u).hash(state),
-      Eterm::Pid(p)     => p.pid.hash(state),
-      Eterm::Integer(i) => i.hash(state),
-      Eterm::List(l)    => l.hash(state),
-      Eterm::Tuple(t)   => t.hash(state),
-      Eterm::Binary(b)  => b.hash(state),
+    match self {
+      &Eterm::Nil        => 0_u64.hash(state),
+      &Eterm::Atom(u)    => make_atom(u).hash(state),
+      &Eterm::Pid(p)     => p.pid.hash(state),
+      &Eterm::Integer(i) => i.hash(state),
+      &Eterm::List(ref l)    => l.hash(state),
+      &Eterm::Tuple(ref t)   => t.hash(state),
+      &Eterm::Binary(ref b)  => b.hash(state),
     }
   }
 }

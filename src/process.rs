@@ -1,5 +1,5 @@
 use std::collections::{HashMap};
-use types::{ApproxTime, Pid};
+use types::{ApproxTime, Pid, MFArity};
 use {beam, world, term, term_heap, message};
 
 // Keys and values are any eterm
@@ -155,23 +155,24 @@ pub fn first_process_otp(state: &mut world::Erts,
                      -> Result<(), String>
 {
   let start_mod = state.atoms.put(&mod_name);
-  match state.find_exported_fun(start_mod, state.atoms.am_start, 2,
+  let mfa = MFArity::new(&start_mod, &state.atoms.am_start, 2);
+  match state.find_exported_fun(&mfa,
                                 state.code_ix.get_active()) {
     Err(())    => return Err("No function ".to_string() + mod_name + ":start/2"),
     Ok(_export) => {}
   }
 
-  let mut p     = Process::new(box term::Eterm::Nil);
+  let mut p     = Process::new(&term::Eterm::Nil);
   let args_vec  = vec! [term::Eterm::Nil,];
-  let args      = box p.heap.make_list(&args_vec, &mut state.terms);
-  p.jump(start_mod, state.atoms.am_start, args);
+  let args = p.heap.make_list(&args_vec, &mut state.terms);
+  p.jump(&*start_mod, &*state.atoms.am_start, &*args);
   return Ok(())
 }
 
 impl Process {
   // Creates new process with given Mod,Fun,Args. Process is not registered or
   // started anywhere yet.
-  pub fn new(parent: Box<term::Eterm>) -> Process
+  pub fn new(parent: &term::Eterm) -> Process
   {
     Process{
       heap:       term_heap::Heap::new(),
@@ -187,8 +188,7 @@ impl Process {
   }
 
   // Begins execution from given m:f, with args a
-  pub fn jump(&mut self, m: Box<term::Eterm>, f: Box<term::Eterm>,
-              a: Box<term::Eterm>)
+  pub fn jump(&mut self, m: &term::Eterm, f: &term::Eterm, a: &term::Eterm)
   {
   }
 }

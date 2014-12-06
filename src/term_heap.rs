@@ -27,8 +27,8 @@ impl Heap {
   }
 
   pub fn make_list(&mut self, values: &Vec<term::Eterm>,
-                   index: &mut EtermIndex) -> term::Eterm
+                   index: &mut EtermIndex) -> Rc<term::Eterm>
   {
-    return term::Eterm::Nil
+    return Rc::new(term::Eterm::Nil)
   }
 }

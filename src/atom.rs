@@ -1,5 +1,6 @@
 use std::collections::{HashMap};
 use std::sync::atomic::{AtomicUint, Ordering};
+use std::rc::{Rc, Weak};
 
 use types::{Uint};
 use term;
@@ -9,9 +10,9 @@ pub struct AtomTable {
   // atomic counter for atom index
   index:    AtomicUint,
   // maps atom name to Eterm
-  entries:  HashMap<String, Box<term::Eterm>>,
+  entries:  HashMap<String, Rc<term::Eterm>>,
 
-  pub am_start: Box<term::Eterm>,
+  pub am_start: Rc<term::Eterm>,
 }
 pub type Table = AtomTable;
 
@@ -20,21 +21,21 @@ impl AtomTable {
     let mut a = AtomTable{
       index:    AtomicUint::new(0),
       entries:  HashMap::new(),
-      am_start: box term::Eterm::Nil,
+      am_start: Rc::new(term::Eterm::Nil),
     };
     a.am_start = a.put(&"start".to_string());
     return a
   }
 
-  // Adds an atom to atom table. Returns boxed atom Eterm (containing index)
-  pub fn put(&mut self, name: &String) -> Box<term::Eterm> {
+  // Adds an atom to atom table. Returns Rc'd atom Eterm
+  pub fn put(&mut self, name: &String) -> Rc<term::Eterm> {
     match self.entries.get(name) {
-      Some(x) => return *x,
+      Some(x) => return x.clone(), // users don't own atoms, just weakrefs
       None    => ()
     }
-    let index: uint = self.index.fetch_add(1, Ordering::SeqCst);
-    let at = box term::Eterm::Atom(term::make_atom(index));
-    self.entries.insert(*name, at);
+    let index: uint     = self.index.fetch_add(1, Ordering::SeqCst);
+    let at = Rc::new(term::Eterm::Atom(term::make_atom(index)));
+    self.entries.insert(name.clone(), at.clone());
     return at;
   }
 }

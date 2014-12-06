@@ -1,6 +1,6 @@
 use {atom, beam_op, erl_init, export, fun, module, process, process_reg};
 use {term_heap};
-use types::{Uint};
+use types::{Uint, MFArity};
 use term;
 use code_index::{CodeIndex};
 
@@ -43,18 +43,18 @@ impl Erts {
   }
 
   pub fn find_exported_fun(&self,
-                          m: Box<term::Eterm>, f: Box<term::Eterm>, a: uint,
+                          mfa: &MFArity,
                           code_ix: uint)
       -> Result<export::Export, ()> {
-    match self.exports[code_ix].find(&(m, f, a)) {
-      Ok(export) => {
+    match self.exports[code_ix].find(mfa) {
+      Some(export) => {
           if export.addressv[code_ix].equals(&export.code, 3)
             && export.code[3] != beam_op::OP_I_GENERIC_BREAKPOINT {
             return Err(());
           }
           return Ok(export)
         },
-      Err(()) => Err(())
+      None => Err(())
     }
   }
 }
