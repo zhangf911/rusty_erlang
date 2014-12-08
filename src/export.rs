@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use std::collections::HashMap;
 use types::{MFArity};
 use beam;
@@ -20,7 +21,7 @@ pub struct Export {
   //    on_load function that has not been run yet, or pointer
   //         to code for function code[3] is a breakpont instruction.
   //    Otherwise: 0.
-  pub code:   beam::Code,
+  pub code:   Rc<beam::Code>,
 }
 
 #[allow(dead_code)]

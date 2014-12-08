@@ -20,7 +20,7 @@ pub struct MFArity {
   f:      Rc<term::Eterm>,
   arity:  uint,
 }
-/*impl Clone for MFArity {
+impl Clone for MFArity {
   fn clone(&self) -> MFArity {
     MFArity{
       m: self.m.clone(),
@@ -33,7 +33,7 @@ pub struct MFArity {
     self.f = source.f.clone();
     self.arity = source.arity;
   }
-}*/
+}
 impl MFArity {
   pub fn new(m: &Rc<term::Eterm>, f: &Rc<term::Eterm>, arity: uint) -> MFArity {
     MFArity{

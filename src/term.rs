@@ -4,6 +4,7 @@ use std::hash::Hash;
 use std::hash::sip::SipState;
 //use num::bigint;
 
+// TODO: move bit magic to term_bits?
 const _TAG_PRIMARY_SIZE: uint = 2;   // bits
 const _TAG_PRIMARY_MASK: Uint = 0x3;
 
@@ -220,12 +221,14 @@ pub enum Eterm {
 }
 
 impl Eterm {
+  // attempt to extract atom index from an Eterm, panic if it isn't an atom
   pub fn get_atom(&self) -> uint {
     match *self {
       Eterm::Atom(u) => return u,
       _              => panic!("Eterm::get_atom not an atom")
     }
   }
+  // attempt to extract a pid from an Eterm, panic if its not a pid
   pub fn get_pid(&self) -> Pid {
     match *self {
       Eterm::Pid(p) => return p.pid,
