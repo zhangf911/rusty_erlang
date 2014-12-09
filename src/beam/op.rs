@@ -1,4 +1,5 @@
-use beam::Instr;
+use beam::code;
+type Instr = code::Instr;
 
 pub const OP_ALLOCATE_TT: Instr = 0;
 pub const OP_ALLOCATE_HEAP_TIT: Instr = 1;

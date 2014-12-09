@@ -12,8 +12,8 @@ pub struct Process {
   // TODO: separate heaps & gc
   heap:   term_heap::Heap,
 
-  cp: beam::Pointer,   // (untagged) Continuation pointer (for threaded code)
-  i:  beam::Pointer,   // Program counter for threaded code
+  cp: beam::code::Pointer, // weak continuation pointer (for threaded code)
+  i:  beam::code::Pointer, // program counter for threaded code
 
   msg: message::Queue,
 
@@ -27,8 +27,8 @@ pub struct Process {
   // Current Erlang function, part of the funcinfo:
   // module(0), function(1), arity(2)
   // (module and functions are tagged atoms; arity an untagged integer).
-  current: beam::Pointer,
-  code:    Rc<beam::Code>,
+  current: beam::code::Pointer,
+  code:    Rc<beam::code::Code>,
 
   //
   // Information mainly for post-mortem use (erl crash dump)
@@ -52,7 +52,7 @@ impl ProcessTable {
 // Locates start_mod module and spawns root process for the whole thing.
 pub fn first_process_otp(state: &mut world::Erts,
                      mod_name: String,
-                     _code: Option<Rc<beam::Code>>)
+                     _code: Option<Rc<beam::code::Code>>)
                      -> Result<(), String>
 {
   let start_mod = state.atoms.put(&mod_name);
@@ -78,16 +78,16 @@ impl Process {
   {
     Process{
       heap:       term_heap::Heap::new(),
-      cp:         beam::Pointer::new_empty(),
-      i:          beam::Pointer::new_empty(),
+      cp:         beam::code::Pointer::new_empty(),
+      i:          beam::code::Pointer::new_empty(),
       msg:        message::Queue::new(),
       dictionary:     HashMap::new(),
 
       initial:        mfa.clone(),
       initial_args:   Rc::new(term::Eterm::Nil), // todo: some premade consts?
 
-      code:           beam::make_empty_code(),      // fill this
-      current:        beam::Pointer::new_empty(),   // fill this
+      code:           beam::code::make_empty_code(),      // fill this
+      current:        beam::code::Pointer::new_empty(),   // fill this
       parent:         parent.get_pid(),
       approx_started: 0,      // fill this
     }

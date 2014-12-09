@@ -1,4 +1,4 @@
-use {atom, beam_op, erl_init, export, fun, module, process, process_reg};
+use {atom, beam, erl_init, export, fun, module, process, process_reg};
 use {term_heap};
 use types::{Uint, MFArity};
 use term;
@@ -48,8 +48,8 @@ impl Erts {
       -> Result<export::Export, ()> {
     match self.exports[code_ix].find(mfa) {
       Some(export) => {
-          if export.addressv[code_ix].equals(&export.code, 3)
-            && export.code[3] != beam_op::OP_I_GENERIC_BREAKPOINT {
+          if export.addressv[code_ix].points_to(&export.code, 3)
+            && export.code[3] != beam::op::OP_I_GENERIC_BREAKPOINT {
             return Err(());
           }
           return Ok(export)

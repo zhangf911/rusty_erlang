@@ -28,7 +28,7 @@ impl Pointer {
     }
   }
 
-  pub fn equals(&self, code: &Rc<Code>, offset: Uint) -> bool {
+  pub fn points_to(&self, code: &Rc<Code>, offset: Uint) -> bool {
     match self.code.upgrade() {
       Some(rc_code) =>
         return rc_code == *code && self.offset == offset,
@@ -60,5 +60,9 @@ pub struct StrongPointer {
 impl StrongPointer {
   pub fn get_op(&self, offset: uint) -> Instr {
     return self.code[offset];
+  }
+
+  pub fn points_to(&self, code: &Rc<Code>, offset: Uint) -> bool {
+    self.code == *code && self.offset == offset
   }
 }

@@ -7,7 +7,7 @@ use beam;
 #[deriving(Clone)]
 pub struct Export {
   // Pointer to code for function
-  pub addressv: Vec<beam::Pointer>,
+  pub addressv: Vec<beam::code::Pointer>,
 
   // code[0]: Tagged atom for module.
   // code[1]: Tagged atom for function.
@@ -21,7 +21,7 @@ pub struct Export {
   //    on_load function that has not been run yet, or pointer
   //         to code for function code[3] is a breakpont instruction.
   //    Otherwise: 0.
-  pub code:   Rc<beam::Code>,
+  pub code:   Rc<beam::code::Code>,
 }
 
 #[allow(dead_code)]

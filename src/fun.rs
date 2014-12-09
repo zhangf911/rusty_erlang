@@ -8,7 +8,7 @@ use term;
 pub struct FunEntry {
   module_md5: String,         // md5 for module
   index:      Uint,           // new style index
-  address:    beam::Pointer,  // pointer to code for fun
+  address:    beam::code::Pointer,  // weak pointer to code for fun
   arity:      Uint,
   module:     term::Eterm,    // tagged atom for module
   refc:       AtomicInt, // Reference count: One for code + one for each

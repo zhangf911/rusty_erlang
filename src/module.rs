@@ -5,7 +5,7 @@ use beam;
 
 #[allow(dead_code)]
 pub struct ModuleInstance {
-  code: beam::Pointer,
+  code: beam::code::Pointer,
   code_length: Uint,    // Length of loaded code in bytes
   //catches: Uint,
   //struct erl_module_nif *nif;
