@@ -1,4 +1,5 @@
 use std::rc::{Rc, Weak};
+
 use types::{Uword, Uint};
 
 pub type Instr  = Uword;

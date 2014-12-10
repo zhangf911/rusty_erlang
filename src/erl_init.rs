@@ -1,6 +1,4 @@
-use alloc;
-use process;
-use world;
+use {alloc, beam, process, world};
 
 static EMULATOR_TYPE: &'static str = "Rusty BEAM";
 static ERLANG_VERSION: &'static str = "18.0";
@@ -100,7 +98,12 @@ fn get_arg(args: &Vec<String>, i: &mut uint) -> Result<String, ()> {
 }
 
 fn erl_init(state: &mut world::Erts) {
+  beam::load_preloaded(state);
+  // erts_end_staging_code_ix()
+  // erts_commit_staging_code_ix()
   process::first_process_otp(state,
                             "otp_ring0".to_string(),
                             None);
+  // erts_start_schedulers()
+  // erl_sys_main_thread()
 }

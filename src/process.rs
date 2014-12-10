@@ -53,14 +53,13 @@ impl ProcessTable {
 pub fn first_process_otp(state: &mut world::Erts,
                      mod_name: String,
                      _code: Option<Rc<beam::code::Code>>)
-                     -> Result<(), String>
 {
   let start_mod = state.atoms.put(&mod_name);
   let mfa = MFArity::new(&start_mod, &state.atoms.am_start, 2);
   match state.find_exported_fun(&mfa,
                                 state.code_ix.get_active()) {
-    None    => return Err("No function ".to_string() + mod_name + ":start/2"),
-    Some(_) => {}
+    None    => panic!("No function ".to_string() + mod_name + ":start/2"),
+    Some(_) => return
   }
 
   let mut p     = Process::new(&term::Eterm::Nil, &mfa);
@@ -68,7 +67,6 @@ pub fn first_process_otp(state: &mut world::Erts,
   // Create args on new process heap
   let args = p.heap.make_list(&args_vec, &mut state.terms);
   p.set_start_args(&args);
-  return Ok(())
 }
 
 impl Process {

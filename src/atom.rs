@@ -29,13 +29,14 @@ impl AtomTable {
 
   // Adds an atom to atom table. Returns Rc'd atom Eterm
   pub fn put(&mut self, name: &String) -> Rc<term::Eterm> {
+    // TODO: trim to MAX_ATOM_CHARACTERS
     match self.entries.get(name) {
       Some(x) => return x.clone(), // users don't own atoms, just weakrefs
       None    => ()
     }
-    let index: uint     = self.index.fetch_add(1, Ordering::SeqCst);
-    let at = Rc::new(term::Eterm::Atom(term::bits::make_atom(index)));
-    self.entries.insert(name.clone(), at.clone());
-    return at;
+    let index: uint = self.index.fetch_add(1, Ordering::SeqCst);
+    let new_atom    = Rc::new(term::Eterm::Atom(term::bits::make_atom(index)));
+    self.entries.insert(name.clone(), new_atom.clone());
+    return new_atom;
   }
 }
