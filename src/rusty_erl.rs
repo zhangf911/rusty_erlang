@@ -15,7 +15,6 @@ mod module;
 mod process;
 mod process_reg;
 mod term;
-mod term_heap;
 mod types;
 mod world;
 

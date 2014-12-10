@@ -1,8 +1,8 @@
 use std::collections::{HashMap};
 use std::sync::atomic::{AtomicUint, Ordering};
-use std::rc::{Rc, Weak};
+use std::rc::{Rc};
 
-use types::{Uint};
+//use types::{Uint};
 use term;
 
 #[allow(dead_code)]
@@ -34,7 +34,7 @@ impl AtomTable {
       None    => ()
     }
     let index: uint     = self.index.fetch_add(1, Ordering::SeqCst);
-    let at = Rc::new(term::Eterm::Atom(term::make_atom(index)));
+    let at = Rc::new(term::Eterm::Atom(term::bits::make_atom(index)));
     self.entries.insert(name.clone(), at.clone());
     return at;
   }

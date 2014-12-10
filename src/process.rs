@@ -1,6 +1,6 @@
 use std::collections::{HashMap};
 use types::{ApproxTime, Pid, MFArity};
-use {beam, world, term, term_heap, message};
+use {beam, world, term, message};
 use std::rc::Rc;
 
 // Keys and values are any eterm
@@ -10,7 +10,7 @@ pub type ProcDict = HashMap<term::Eterm, term::Eterm>;
 #[allow(dead_code)]
 pub struct Process {
   // TODO: separate heaps & gc
-  heap:   term_heap::Heap,
+  heap:   term::heap::Heap,
 
   cp: beam::code::Pointer, // weak continuation pointer (for threaded code)
   i:  beam::code::Pointer, // program counter for threaded code
@@ -59,8 +59,8 @@ pub fn first_process_otp(state: &mut world::Erts,
   let mfa = MFArity::new(&start_mod, &state.atoms.am_start, 2);
   match state.find_exported_fun(&mfa,
                                 state.code_ix.get_active()) {
-    Err(())    => return Err("No function ".to_string() + mod_name + ":start/2"),
-    Ok(_export) => {}
+    None    => return Err("No function ".to_string() + mod_name + ":start/2"),
+    Some(_) => {}
   }
 
   let mut p     = Process::new(&term::Eterm::Nil, &mfa);
@@ -77,7 +77,7 @@ impl Process {
   pub fn new(parent: &term::Eterm, mfa: &MFArity) -> Process
   {
     Process{
-      heap:       term_heap::Heap::new(),
+      heap:       term::heap::Heap::new(),
       cp:         beam::code::Pointer::new_empty(),
       i:          beam::code::Pointer::new_empty(),
       msg:        message::Queue::new(),

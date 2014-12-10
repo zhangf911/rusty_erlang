@@ -1,7 +1,7 @@
 use std::cmp::{Eq, PartialEq};
 use std::hash::Hash;
 use std::hash::sip::SipState;
-use std::rc::{Rc, Weak};
+use std::rc::{Rc};
 use term;
 
 pub type Uint = u64;
