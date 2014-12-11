@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use types::{Uint};
-use term;
-use beam;
+use {beam, term};
 
 #[allow(dead_code)]
 pub struct ModuleInstance {

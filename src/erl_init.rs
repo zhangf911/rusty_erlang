@@ -98,7 +98,7 @@ fn get_arg(args: &Vec<String>, i: &mut uint) -> Result<String, ()> {
 }
 
 fn erl_init(state: &mut world::Erts) {
-  beam::load_preloaded(state);
+  beam::load::load_preloaded(state);
   // erts_end_staging_code_ix()
   // erts_commit_staging_code_ix()
   process::first_process_otp(state,
