@@ -58,7 +58,7 @@ pub fn first_process_otp(state: &mut world::Erts,
   let mfa = MFArity::new(&start_mod, &state.atoms.am_start, 2);
   match state.find_exported_fun(&mfa,
                                 state.code_ix.get_active()) {
-    None    => panic!("No function ".to_string() + mod_name + ":start/2"),
+    None    => panic!(format!("No function {}:start/2", mod_name)),
     Some(_) => return
   }
 

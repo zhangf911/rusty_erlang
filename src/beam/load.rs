@@ -10,6 +10,7 @@ pub fn load_preloaded(state: &mut world::Erts) {
     let str_mod_name    = (*mod_name).to_string();
     let mod_atom: Rc<_> = state.atoms.put(&str_mod_name);
     let raw_beam        = RawBeam::load(&"preload".to_string(), &str_mod_name);
+    erts_preload_module(term::Nil, term::Nil, raw_beam);
   }
 }
 
@@ -117,4 +118,7 @@ struct LoaderState {
   //Eterm *fname;   // List of file names
   //int num_fnames;   // Number of filenames in fname table
   //int loc_size;   // Size of location info in bytes (2/4)
+}
+
+fn erts_preload_module(pid: Pid, gleader: Pid, raw_beam: &RawBeam) {
 }

@@ -2,16 +2,18 @@
 use std::io::File;
 
 pub struct RawBeam {
-  bytes: Vec<u8>,
+  pub mod_name: String,
+  bytes:        Vec<u8>,
 }
 
 impl RawBeam {
   pub fn load(dir: &String, mod_name: &String) -> RawBeam {
-    let path = Path::new(*dir + "/" + mod_name + ".beam");
+    let path = Path::new(format!("{}/{}.beam", dir, mod_name));
     let mut hw_file = File::open(&path);
     match hw_file.read_to_end() {
       Ok(bytes_read) => RawBeam {
-                    bytes: bytes_read
+                    mod_name: *mod_name,
+                    bytes:    bytes_read
                   },
       Err(ioerr) => {
           println!("raw beam load error: {}", ioerr);
