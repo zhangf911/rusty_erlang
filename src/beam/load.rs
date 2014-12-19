@@ -1,18 +1,7 @@
 use std::rc::{Rc};
 use {world, term};
 use beam::raw_beam::RawBeam;
-
-pub fn load_preloaded(state: &mut world::Erts) {
-  let mods = vec!["otp_ring0", "init", "prim_eval", "prim_inet", "prim_file",
-                  "zlib", "prim_zip", "erl_prim_loader", "erlang",
-                  "erts_internal"];
-  for mod_name in mods.iter() {
-    let str_mod_name    = (*mod_name).to_string();
-    let mod_atom: Rc<_> = state.atoms.put(&str_mod_name);
-    let raw_beam        = RawBeam::load(&"preload".to_string(), &str_mod_name);
-    erts_preload_module(term::Nil, term::Nil, raw_beam);
-  }
-}
+use types::{Pid};
 
 struct LoaderState {
   /*
@@ -119,6 +108,59 @@ struct LoaderState {
   //int num_fnames;   // Number of filenames in fname table
   //int loc_size;   // Size of location info in bytes (2/4)
 }
+impl LoaderState {
+  pub fn new() -> LoaderState {
+    LoaderState {
+      file_name: String::new(),
+      chunks: Vec::new(),
+      may_load_nif: false,
+      atoms: Vec::new(),
+    };
+  }
+}
 
-fn erts_preload_module(pid: Pid, gleader: Pid, raw_beam: &RawBeam) {
+
+pub fn load_preloaded(state: &mut world::Erts) {
+  let mods = vec!["otp_ring0", "init", "prim_eval", "prim_inet", "prim_file",
+                  "zlib", "prim_zip", "erl_prim_loader", "erlang",
+                  "erts_internal"];
+  for mod_name in mods.iter() {
+    let str_mod_name    = (*mod_name).to_string();
+    let mod_atom: Rc<_> = state.atoms.put(&str_mod_name);
+    let raw_beam        = RawBeam::load(&"preload".to_string(), &str_mod_name);
+    erts_preload_module(None, None, mod_atom, &raw_beam);
+    //sys_preload_end(str_mod_name);
+    // TODO: check error here
+  }
+}
+                   bara ramla ut ur
+enum LoadError {
+  BadFile,
+}
+
+fn erts_preload_module(c_p: Option<Pid>,
+                       group_leader: Option<Pid>,
+                       mod_atom: Rc<term::Eterm>,
+                       raw_beam: &RawBeam) -> Result<(), LoadError>
+{
+  let mut state = LoaderState::new();
+
+  //ASSERT(!erts_initialized);
+  let retval = erts_prepare_loading(&mut state, c_p, group_leader, raw_beam);
+
+  match retval {
+    Ok(()) => {},
+    Err(_) => return retval,
+  }
+
+  //erts_finish_loading(state, c_p, c_p_locks, modp);
+  return retval;
+}
+
+fn erts_prepare_loading(state: &mut LoaderState,
+                        c_p: Option<Pid>,
+                        group_leader: Option<Pid>,
+                        raw_beam: &RawBeam) -> Result<(), LoadError>
+{
+  return Ok(());
 }

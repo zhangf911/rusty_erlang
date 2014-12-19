@@ -12,12 +12,11 @@ impl RawBeam {
     let mut hw_file = File::open(&path);
     match hw_file.read_to_end() {
       Ok(bytes_read) => RawBeam {
-                    mod_name: *mod_name,
+                    mod_name: mod_name.clone(),
                     bytes:    bytes_read
                   },
       Err(ioerr) => {
-          println!("raw beam load error: {}", ioerr);
-          panic!("raw beam load error")
+          panic!(format!("raw beam load error: {}", ioerr));
         }
     }
   }
